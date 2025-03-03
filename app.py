@@ -59,4 +59,4 @@ def send_message_to_telegram(message):
         print("there was an eror in send data to server,try again later!:", str(e))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)
